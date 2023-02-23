@@ -67,8 +67,9 @@ public class TestUtils {
      * @param wlpInstallPath   The liberty installation relative path.
      */
     public static void validateAppStarted(String testName, String appUrl, String expectedResponse, String wlpInstallPath) {
-        int retryCountLimit = 30;
-        int retryIntervalSecs = 5;
+
+        int retryCountLimit = 36;
+        int reryIntervalSecs = 5;
         int retryCount = 0;
 
         while (retryCount < retryCountLimit) {
@@ -82,7 +83,7 @@ public class TestUtils {
                 status = con.getResponseCode();
 
                 if (status != HttpURLConnection.HTTP_OK) {
-                    Thread.sleep(retryIntervalSecs * 1000);
+                    Thread.sleep(reryIntervalSecs * 1000);
                     con.disconnect();
                     System.out.println("INFO: validateAppStarted: Retrying. Cause: Unexpected HTTP request status: " + status + ". Retry: " + retryCount);
                     continue;
@@ -96,7 +97,7 @@ public class TestUtils {
                 }
 
                 if (!(content.toString().contains(expectedResponse))) {
-                    Thread.sleep(retryIntervalSecs * 1000);
+                    Thread.sleep(reryIntervalSecs * 1000);
                     con.disconnect();
                     System.out.println("INFO: validateAppStarted: Retrying. Cause: Unexpected HTTP response: " + content + ". Retry: " + retryCount);
                     continue;
@@ -107,7 +108,7 @@ public class TestUtils {
             } catch (Exception e) {
                 System.out.println("INFO: validateAppStarted: Retrying. Cause: Exception: " + e.getMessage() + ", retry: " + retryCount);
                 try {
-                    Thread.sleep(retryIntervalSecs * 1000);
+                    Thread.sleep(reryIntervalSecs * 1000);
                 } catch (Exception ee) {
                     ee.printStackTrace(System.out);
                 }

@@ -9,22 +9,22 @@
  *******************************************************************************/
 package io.openliberty.tools.intellij.it;
 
-
-import com.intellij.remoterobot.RemoteRobot;
-import com.intellij.remoterobot.fixtures.*;
-import com.intellij.remoterobot.fixtures.dataExtractor.RemoteText;
 import com.intellij.remoterobot.search.locators.Locator;
 import com.intellij.remoterobot.utils.Keyboard;
 import static java.awt.event.KeyEvent.*;
-import com.intellij.remoterobot.utils.RepeatUtilsKt;
 
+import com.intellij.remoterobot.RemoteRobot;
+import com.intellij.remoterobot.fixtures.ComponentFixture;
+import com.intellij.remoterobot.fixtures.JButtonFixture;
+import com.intellij.remoterobot.fixtures.JTextFieldFixture;
+import com.intellij.remoterobot.fixtures.dataExtractor.RemoteText;
+import com.intellij.remoterobot.utils.RepeatUtilsKt;
 import io.openliberty.tools.intellij.it.fixtures.DialogFixture;
 import io.openliberty.tools.intellij.it.fixtures.ProjectFrameFixture;
 import io.openliberty.tools.intellij.it.fixtures.WelcomeFrameFixture;
 import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
-
 import java.awt.*;
+
 import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
@@ -35,7 +35,6 @@ import java.util.List;
 
 import static com.intellij.remoterobot.search.locators.Locators.byXpath;
 import static com.intellij.remoterobot.stepsProcessing.StepWorkerKt.step;
-import static org.gradle.util.Path.path;
 
 /**
  * Helper function.
@@ -115,13 +114,6 @@ public class UIBotTestUtils {
         Keyboard keyboard = new Keyboard(remoteRobot);
         keyboard.hotKey(VK_CONTROL, VK_Q);
         keyboard.hotKey(VK_CONTROL, VK_Q);
-/*
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-*/
     }
 
     public static String moveMouseToFeatureInServerXML(RemoteRobot remoteRobot, String featureString){
@@ -144,6 +136,7 @@ public class UIBotTestUtils {
         return "not implemented yet";
 
     }
+
     /**
      * Runs a dashboard action using the project's the drop-down menu view.
      *

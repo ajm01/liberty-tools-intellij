@@ -15,10 +15,12 @@ import com.intellij.remoterobot.fixtures.CommonContainerFixture;
 import com.intellij.remoterobot.fixtures.ComponentFixture;
 import com.intellij.remoterobot.fixtures.DefaultXpath;
 import com.intellij.remoterobot.fixtures.FixtureName;
+import com.intellij.remoterobot.utils.RepeatUtilsKt;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 
 import java.time.Duration;
+import java.util.List;
 
 import static com.intellij.remoterobot.search.locators.Locators.byXpath;
 
@@ -43,7 +45,10 @@ public class ProjectFrameFixture extends CommonContainerFixture {
                 break;
             case ACTIONMENUITEM:
                 String amiText = searchValues[0];
-                cf = find(ComponentFixture.class, byXpath("//div[@class='ActionMenuItem' and @text='" + amiText + "']"), Duration.ofSeconds(10));
+                RepeatUtilsKt.waitFor(Duration.ofSeconds(10), Duration.ofSeconds(1), "Wait for Menu items", "No Menu items found", () -> !findAll(ComponentFixture.class, byXpath("//div[@class='ActionMenuItem' and @text='" + amiText + "']")).isEmpty());
+                List<ComponentFixture> list = findAll(ComponentFixture.class, byXpath("//div[@class='ActionMenuItem' and @text='" + amiText + "']"));
+                cf = list.get(0);
+
                 break;
             case ACTIONBUTTON:
                 String abName = searchValues[0];

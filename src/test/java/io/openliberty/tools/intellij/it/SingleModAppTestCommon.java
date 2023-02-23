@@ -42,8 +42,7 @@ public abstract class SingleModAppTestCommon {
     @AfterAll
     public static void cleanup() {
         // close project window.
-        // TODO: FIX CLOSE.
-        //UIBotTestUtils.closeProject(remoteRobot);
+        UIBotTestUtils.closeProject(remoteRobot);
     }
 
     @Test
