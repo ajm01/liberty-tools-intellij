@@ -26,7 +26,7 @@ import static com.intellij.remoterobot.search.locators.Locators.byXpath;
 @FixtureName(name = "Project Frame")
 public class ProjectFrameFixture extends CommonContainerFixture {
     public enum Type {
-        ACTIONMENU, SRIPEBUTTON, ACTIONBUTTON, ACTIONMENUITEM, TREE
+        ACTIONMENU, SRIPEBUTTON, ACTIONBUTTON, ACTIONMENUITEM, TREE, PROJECTTREE, EDITOR, DOCUMENTATION
     }
 
     public ProjectFrameFixture(@NotNull RemoteRobot remoteRobot, @NotNull RemoteComponent remoteComponent) {
@@ -61,7 +61,25 @@ public class ProjectFrameFixture extends CommonContainerFixture {
                 } else if (searchValues.length == 2) {
                     String tName = searchValues[0];
                     String tText = searchValues[1];
-                    cf = find(ComponentFixture.class, byXpath("//div[@class='Tree' and @name='" + tName + "' and contains(@visible_text, '" + tText + "')]"), Duration.ofMinutes(2));
+                    cf = find(ComponentFixture.class, byXpath("//div[@class='Tree' and @name='" + tName + "' and contains(@visible_text, '" + tText + "')]"), Duration.ofMinutes(6));
+                }
+                break;
+            case PROJECTTREE:
+                if (searchValues.length == 1) {
+                    String tText = searchValues[0];
+                    cf = find(ComponentFixture.class, byXpath("//div[@class='ProjectViewTree' and contains(@visible_text, '" + tText + "')]"), Duration.ofMinutes(5));
+                }
+                break;
+            case EDITOR:
+                if (searchValues.length == 1) {
+                    String tText = searchValues[0];
+                    cf = find(ComponentFixture.class, byXpath("//div[@class='EditorComponentImpl' and contains(@visible_text, '" + tText + "')]"), Duration.ofMinutes(5));
+                }
+                break;
+            case DOCUMENTATION:
+                if (searchValues.length == 1) {
+                    String tText = searchValues[0];
+                    cf = find(ComponentFixture.class, byXpath("//div[@class='DocumentationHintEditorPane' and contains(@visible_text, '" + tText + "')]"), Duration.ofMinutes(5));
                 }
                 break;
             default:

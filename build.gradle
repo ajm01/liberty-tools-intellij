@@ -63,7 +63,7 @@ dependencies {
     testImplementation 'com.squareup.okhttp3:logging-interceptor:4.10.0'
 
     // Test: Video Recording.
-    implementation 'com.automation-remarks:video-recorder-junit5:2.0'
+    // implementation 'com.automation-remarks:video-recorder-junit5:2.0'
 
     lsp('org.eclipse.lsp4mp:org.eclipse.lsp4mp.ls:0.5.0:uber') {
         transitive = false

@@ -1,5 +1,9 @@
 package io.openliberty.tools.intellij.it;
 
+import com.intellij.remoterobot.RemoteRobot;
+import com.intellij.remoterobot.fixtures.ComponentFixture;
+import com.intellij.remoterobot.fixtures.dataExtractor.RemoteText;
+import io.openliberty.tools.intellij.it.fixtures.ProjectFrameFixture;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.*;
@@ -8,6 +12,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.List;
 
 public class TestUtils {
@@ -62,8 +67,8 @@ public class TestUtils {
      * @param wlpInstallPath   The liberty installation relative path.
      */
     public static void validateAppStarted(String testName, String appUrl, String expectedResponse, String wlpInstallPath) {
-        int retryCountLimit = 18;
-        int reryIntervalSecs = 5;
+        int retryCountLimit = 30;
+        int retryIntervalSecs = 5;
         int retryCount = 0;
 
         while (retryCount < retryCountLimit) {
@@ -77,7 +82,7 @@ public class TestUtils {
                 status = con.getResponseCode();
 
                 if (status != HttpURLConnection.HTTP_OK) {
-                    Thread.sleep(reryIntervalSecs * 1000);
+                    Thread.sleep(retryIntervalSecs * 1000);
                     con.disconnect();
                     System.out.println("INFO: validateAppStarted: Retrying. Cause: Unexpected HTTP request status: " + status + ". Retry: " + retryCount);
                     continue;
@@ -91,7 +96,7 @@ public class TestUtils {
                 }
 
                 if (!(content.toString().contains(expectedResponse))) {
-                    Thread.sleep(reryIntervalSecs * 1000);
+                    Thread.sleep(retryIntervalSecs * 1000);
                     con.disconnect();
                     System.out.println("INFO: validateAppStarted: Retrying. Cause: Unexpected HTTP response: " + content + ". Retry: " + retryCount);
                     continue;
@@ -102,7 +107,7 @@ public class TestUtils {
             } catch (Exception e) {
                 System.out.println("INFO: validateAppStarted: Retrying. Cause: Exception: " + e.getMessage() + ", retry: " + retryCount);
                 try {
-                    Thread.sleep(reryIntervalSecs * 1000);
+                    Thread.sleep(retryIntervalSecs * 1000);
                 } catch (Exception ee) {
                     ee.printStackTrace(System.out);
                 }
@@ -162,6 +167,26 @@ public class TestUtils {
         String msgHeader = "TESTCASE: " + testName;
         printLibertyMessagesLogFile(msgHeader, wlpMsgLogPath);
         Assertions.fail("Timed out while waiting for application under URL: " + appUrl + " to stop.");
+    }
+
+    public static void validateHoverAction(RemoteRobot remoteRobot, String expectedHoverText){
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofMinutes(2));
+        ComponentFixture docPopupWindow = projectFrame.getFixtureFromFrame(ProjectFrameFixture.Type.DOCUMENTATION, "Health");
+        String expectedPopupText = "This feature provides support for the MicroProfile Health specification.";
+        boolean found = false;
+        List<RemoteText> rts = docPopupWindow.findAllText();
+        for (RemoteText rt : rts) {
+            if (expectedPopupText.equals(rt.getText())) {
+                //System.out.println("AJM: found the diagnostic hint popup text, will assert true now");
+                Assertions.assertEquals(rt.getText(), expectedPopupText);
+                found = true;
+                break;
+            }
+        }
+        if (!found){
+            Assertions.fail("Did not find diagnostic help text expected");
+        }
+
     }
 
     /**

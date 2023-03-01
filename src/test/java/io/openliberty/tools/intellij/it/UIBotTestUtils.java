@@ -9,17 +9,22 @@
  *******************************************************************************/
 package io.openliberty.tools.intellij.it;
 
+
 import com.intellij.remoterobot.RemoteRobot;
-import com.intellij.remoterobot.fixtures.ComponentFixture;
-import com.intellij.remoterobot.fixtures.JButtonFixture;
-import com.intellij.remoterobot.fixtures.JTextFieldFixture;
+import com.intellij.remoterobot.fixtures.*;
 import com.intellij.remoterobot.fixtures.dataExtractor.RemoteText;
+import com.intellij.remoterobot.search.locators.Locator;
+import com.intellij.remoterobot.utils.Keyboard;
+import static java.awt.event.KeyEvent.*;
 import com.intellij.remoterobot.utils.RepeatUtilsKt;
+
 import io.openliberty.tools.intellij.it.fixtures.DialogFixture;
 import io.openliberty.tools.intellij.it.fixtures.ProjectFrameFixture;
 import io.openliberty.tools.intellij.it.fixtures.WelcomeFrameFixture;
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
@@ -30,6 +35,7 @@ import java.util.List;
 
 import static com.intellij.remoterobot.search.locators.Locators.byXpath;
 import static com.intellij.remoterobot.stepsProcessing.StepWorkerKt.step;
+import static org.gradle.util.Path.path;
 
 /**
  * Helper function.
@@ -86,6 +92,58 @@ public class UIBotTestUtils {
         closeFixture.click();
     }
 
+    public static void featureHoverInGradleAppServerXML(RemoteRobot remoteRobot, String appName, String hoverTarget) {
+
+        // Click on File on the Menu bar.
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofMinutes(2));
+        ComponentFixture appNameEntry = projectFrame.getFixtureFromFrame(ProjectFrameFixture.Type.PROJECTTREE, appName);
+        appNameEntry.findText(appName).doubleClick();
+        appNameEntry.findText("src").doubleClick();
+        appNameEntry.findText("main").doubleClick();
+        appNameEntry.findText("liberty").doubleClick();
+        appNameEntry.findText("server.xml").doubleClick();
+
+        ComponentFixture editor = projectFrame.getFixtureFromFrame(ProjectFrameFixture.Type.EDITOR, "mpHealth-4.0");
+
+        Point p;
+        p = editor.findText(hoverTarget).getPoint();
+        int col = p.x;
+        int line = p.y;
+        col = col+2;
+
+        editor.runJs("robot.moveMouse(component, " + col + ", " + line + ");");
+        Keyboard keyboard = new Keyboard(remoteRobot);
+        keyboard.hotKey(VK_CONTROL, VK_Q);
+        keyboard.hotKey(VK_CONTROL, VK_Q);
+/*
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+*/
+    }
+
+    public static String moveMouseToFeatureInServerXML(RemoteRobot remoteRobot, String featureString){
+
+        // get a handle to the editor fixture?
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofMinutes(2));
+        Locator editorLocator = byXpath("//div[@class='PsiAwareTextEditorComponent']");
+        ComponentFixture editor = projectFrame.getFixtureFromFrame(ProjectFrameFixture.Type.EDITOR, "mpHealth-4.0");
+
+        //TextEditorFixture editorFF = remoteRobot.find(TextEditorFixture.class, editorLocator, Duration.ofMinutes(2));
+        //editorFF.runJs(".moveMouse(15,22);");
+        try {
+            Thread.sleep(20000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        editor.findText(featureString).moveMouse();
+
+        //return the retrieved popup string
+        return "not implemented yet";
+
+    }
     /**
      * Runs a dashboard action using the project's the drop-down menu view.
      *
