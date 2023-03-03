@@ -12,7 +12,7 @@ public abstract class SingleModLibertyLSTestCommon {
     public static final String REMOTEBOT_URL = "http://localhost:8082";
     public static final RemoteRobot remoteRobot = new RemoteRobot(REMOTEBOT_URL);
 
-    String projectName;
+    public static String projectName;
     String projectPath;
     String wlpInstallPath;
     String appBaseURL;
@@ -40,10 +40,18 @@ public abstract class SingleModLibertyLSTestCommon {
     }
 
     @AfterAll
-    public static void cleanup() {
+    public static
+    void cleanup() {
+        // close ProjectViewTree
+        UIBotTestUtils.closeProjectViewTree(remoteRobot, projectName);
+
+        // click on the project stripebar to close that view
+        // (the 'open' method basically opens/closes that view buy just clicking on it)
+        UIBotTestUtils.openViewUsingToolWindowPaneStripe(remoteRobot, "Project");
+        UIBotTestUtils.openViewUsingToolWindowPaneStripe(remoteRobot, "Liberty");
+
         // close project window.
-        // TODO: FIX CLOSE.
-        //UIBotTestUtils.closeProject(remoteRobot);
+        UIBotTestUtils.closeProject(remoteRobot);
     }
 
     @Test
@@ -74,9 +82,9 @@ public abstract class SingleModLibertyLSTestCommon {
 
         // Open the project and the Liberty plugin views.
         UIBotTestUtils.openViewUsingToolWindowPaneStripe(remoteRobot, "Project");
-        //UIBotTestUtils.openViewUsingToolWindowPaneStripe(remoteRobot, "Liberty");
-        //UIBotTestUtils.waitForProjectToShownInDashboard(remoteRobot, "LibertyTree", projectName);
-        //UIBotTestUtils.openGradleAppServerXML(remoteRobot, projectName);
+        UIBotTestUtils.openViewUsingToolWindowPaneStripe(remoteRobot, "Liberty");
+        UIBotTestUtils.waitForProjectToShownInDashboard(remoteRobot, "LibertyTree", projectName);
+        UIBotTestUtils.openServerXMLFile(remoteRobot, projectName);
     }
 
 

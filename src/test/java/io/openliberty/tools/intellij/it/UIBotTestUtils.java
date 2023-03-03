@@ -91,17 +91,29 @@ public class UIBotTestUtils {
         closeFixture.click();
     }
 
-    public static void featureHoverInGradleAppServerXML(RemoteRobot remoteRobot, String appName, String hoverTarget) {
-
-        // Click on File on the Menu bar.
+    public static void closeProjectViewTree(RemoteRobot remoteRobot, String appName) {
         ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofMinutes(2));
         ComponentFixture appNameEntry = projectFrame.getFixtureFromFrame(ProjectFrameFixture.Type.PROJECTTREE, appName);
         appNameEntry.findText(appName).doubleClick();
-        appNameEntry.findText("src").doubleClick();
-        appNameEntry.findText("main").doubleClick();
-        appNameEntry.findText("liberty").doubleClick();
-        appNameEntry.findText("server.xml").doubleClick();
+    }
 
+    public static void openServerXMLFile(RemoteRobot remoteRobot, String appName){
+        // Click on File on the Menu bar.
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofMinutes(2));
+        ComponentFixture appNameEntry = projectFrame.getFixtureFromFrame(ProjectFrameFixture.Type.PROJECTTREE, appName);
+        if (!appNameEntry.hasText("server.xml")){
+            appNameEntry.findText(appName).doubleClick();
+            appNameEntry.findText("src").doubleClick();
+            appNameEntry.findText("main").doubleClick();
+            appNameEntry.findText("liberty").doubleClick();
+            appNameEntry.findText("server.xml").doubleClick();
+        }
+        else {
+            appNameEntry.findText("server.xml").doubleClick();
+        }
+    }
+    public static void featureHoverInGradleAppServerXML(RemoteRobot remoteRobot, String appName, String hoverTarget) {
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofMinutes(2));
         ComponentFixture editor = projectFrame.getFixtureFromFrame(ProjectFrameFixture.Type.EDITOR, "mpHealth-4.0");
 
         Point p;

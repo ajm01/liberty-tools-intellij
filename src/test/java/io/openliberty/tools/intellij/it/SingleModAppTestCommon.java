@@ -12,7 +12,7 @@ public abstract class SingleModAppTestCommon {
     public static final String REMOTEBOT_URL = "http://localhost:8082";
     public static final RemoteRobot remoteRobot = new RemoteRobot(REMOTEBOT_URL);
 
-    String projectName;
+    public static String projectName;
     String projectPath;
     String wlpInstallPath;
     String appBaseURL;
@@ -41,6 +41,12 @@ public abstract class SingleModAppTestCommon {
 
     @AfterAll
     public static void cleanup() {
+
+        // click on the project stripebar to close that view
+        // (the 'open' method basically opens/closes that view buy just clicking on it)
+        UIBotTestUtils.openViewUsingToolWindowPaneStripe(remoteRobot, "Project");
+        UIBotTestUtils.openViewUsingToolWindowPaneStripe(remoteRobot, "Liberty");
+
         // close project window.
         UIBotTestUtils.closeProject(remoteRobot);
     }
