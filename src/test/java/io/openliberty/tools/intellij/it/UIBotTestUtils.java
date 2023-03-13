@@ -9,6 +9,9 @@
  *******************************************************************************/
 package io.openliberty.tools.intellij.it;
 
+import com.intellij.remoterobot.utils.Keyboard;
+import static java.awt.event.KeyEvent.*;
+
 import com.intellij.remoterobot.RemoteRobot;
 import com.intellij.remoterobot.fixtures.ComponentFixture;
 import com.intellij.remoterobot.fixtures.JButtonFixture;
@@ -21,6 +24,7 @@ import io.openliberty.tools.intellij.it.fixtures.DialogFixture;
 import io.openliberty.tools.intellij.it.fixtures.ProjectFrameFixture;
 import io.openliberty.tools.intellij.it.fixtures.WelcomeFrameFixture;
 import org.junit.Assert;
+import java.awt.*;
 
 import java.io.BufferedReader;
 import java.io.FileWriter;
@@ -286,6 +290,58 @@ public class UIBotTestUtils {
         Locator locator = byXpath("//div[@class='LibertyExplorer']//div[@class='ActionButton' and contains(@myaction.key, 'action.ExpandAll.text')]");
         ComponentFixture actionButton = projectFrame.getActionButton(locator);
         actionButton.click();
+    }
+
+    public static void closeProjectViewTree(RemoteRobot remoteRobot, String appName) {
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofMinutes(2));
+        ComponentFixture appNameEntry = projectFrame.getProjectViewTree(appName);
+        appNameEntry.findText(appName).doubleClick();
+    }
+
+    public static void openServerXMLFile(RemoteRobot remoteRobot, String appName){
+        // Click on File on the Menu bar.
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofMinutes(2));
+        //ComponentFixture appNameEntry = projectFrame.getFixtureFromFrame(ProjectFrameFixture.Type.PROJECTTREE, appName);
+        ComponentFixture appNameEntry = projectFrame.getProjectViewTree(appName);
+        if (!appNameEntry.hasText("server.xml")){
+            appNameEntry.findText(appName).doubleClick();
+            appNameEntry.findText("src").doubleClick();
+            appNameEntry.findText("main").doubleClick();
+            appNameEntry.findText("liberty").doubleClick();
+            appNameEntry.findText("server.xml").doubleClick();
+        }
+        else {
+            appNameEntry.findText("server.xml").doubleClick();
+        }
+    }
+
+    public static void closeSourceFile(RemoteRobot remoteRobot, String srcFileName) {
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofSeconds(10));
+
+        try {
+            Locator locator = byXpath("//div[@accessiblename='" + srcFileName + "' and @class='SingleHeightLabel']//div[@class='InplaceButton']");
+            ComponentFixture actionButton = projectFrame.getActionButton(locator);
+            actionButton.click();
+
+        } catch (WaitForConditionTimeoutException e) {
+            // server.xml not open, nothing to do
+        }
+    }
+
+    public static void featureHoverInGradleAppServerXML(RemoteRobot remoteRobot, String appName, String hoverTarget) {
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofMinutes(2));
+        ComponentFixture editor = projectFrame.getEditorPane("mpHealth-4.0");
+
+        Point p;
+        p = editor.findText(hoverTarget).getPoint();
+        int col = p.x;
+        int line = p.y;
+        col = col+2;
+
+        editor.runJs("robot.moveMouse(component, " + col + ", " + line + ");");
+        Keyboard keyboard = new Keyboard(remoteRobot);
+        keyboard.hotKey(VK_CONTROL, VK_Q);
+        keyboard.hotKey(VK_CONTROL, VK_Q);
     }
 
     /**

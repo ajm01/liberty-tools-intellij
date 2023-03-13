@@ -1,5 +1,9 @@
 package io.openliberty.tools.intellij.it;
 
+import com.intellij.remoterobot.RemoteRobot;
+import com.intellij.remoterobot.fixtures.ComponentFixture;
+import com.intellij.remoterobot.fixtures.dataExtractor.RemoteText;
+import io.openliberty.tools.intellij.it.fixtures.ProjectFrameFixture;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.*;
@@ -8,6 +12,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -183,6 +188,26 @@ public class TestUtils {
         String msgHeader = "TESTCASE: " + testName;
         printLibertyMessagesLogFile(msgHeader, wlpMsgLogPath);
         Assertions.fail("Timed out while waiting for application under URL: " + appUrl + " to stop.");
+    }
+
+    public static void validateHoverAction(RemoteRobot remoteRobot, String expectedHoverText){
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofMinutes(2));
+        ComponentFixture docPopupWindow = projectFrame.getDocumentationHintEditorPane("Health");
+        String expectedPopupText = "This feature provides support for the MicroProfile Health specification.";
+        boolean found = false;
+        List<RemoteText> rts = docPopupWindow.findAllText();
+        for (RemoteText rt : rts) {
+            if (expectedPopupText.equals(rt.getText())) {
+                //System.out.println("AJM: found the diagnostic hint popup text, will assert true now");
+                Assertions.assertEquals(rt.getText(), expectedPopupText);
+                found = true;
+                break;
+            }
+        }
+        if (!found){
+            Assertions.fail("Did not find diagnostic help text expected");
+        }
+
     }
 
     /**
