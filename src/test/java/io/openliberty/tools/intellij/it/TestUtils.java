@@ -217,6 +217,15 @@ public class TestUtils {
         }
     }
 
+    public static void validateFeatureInServerXML(String pathToServerXml, String insertedFeature) {
+
+        System.out.println("AJM: looking for: " + insertedFeature + " in file: " + pathToServerXml);
+        try {
+            Assertions.assertTrue(isTextInFile(pathToServerXml, insertedFeature));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     /**
      * Prints the Liberty server's messages.log identified by the input path.
      *

@@ -9,8 +9,12 @@
  *******************************************************************************/
 package io.openliberty.tools.intellij.it;
 
-import com.intellij.remoterobot.RemoteRobot;
 import com.intellij.remoterobot.fixtures.*;
+import com.intellij.remoterobot.utils.Keyboard;
+
+import static java.awt.event.KeyEvent.*;
+
+import com.intellij.remoterobot.RemoteRobot;
 import com.intellij.remoterobot.fixtures.dataExtractor.RemoteText;
 import com.intellij.remoterobot.search.locators.Locator;
 import com.intellij.remoterobot.utils.RepeatUtilsKt;
@@ -21,6 +25,8 @@ import io.openliberty.tools.intellij.it.fixtures.WelcomeFrameFixture;
 import org.junit.Assert;
 
 import java.awt.*;
+
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
@@ -31,6 +37,7 @@ import java.util.List;
 
 import static com.intellij.remoterobot.search.locators.Locators.byXpath;
 import static com.intellij.remoterobot.stepsProcessing.StepWorkerKt.step;
+import static java.time.Duration.ofSeconds;
 
 /**
  * UI helper function.
@@ -39,6 +46,10 @@ public class UIBotTestUtils {
 
     public enum PrintTo {
         STDOUT, FILE
+    }
+
+    public enum InsertionType {
+        FEATURE, CONFIG
     }
 
     /**
@@ -50,12 +61,12 @@ public class UIBotTestUtils {
     public static void importProject(RemoteRobot remoteRobot, String projectPath, String projectName) {
         step("Import Project", () -> {
             // Start the open project dialog.
-            WelcomeFrameFixture welcomePage = remoteRobot.find(WelcomeFrameFixture.class, Duration.ofSeconds(10));
+            WelcomeFrameFixture welcomePage = remoteRobot.find(WelcomeFrameFixture.class, ofSeconds(10));
             ComponentFixture cf = welcomePage.getOpenProjectComponentFixture("Open");
             cf.click();
 
             // Specify the project's path. The text field is pre-populated by default.
-            DialogFixture newProjectDialog = welcomePage.find(DialogFixture.class, DialogFixture.byTitle("Open File or Project"), Duration.ofSeconds(10));
+            DialogFixture newProjectDialog = welcomePage.find(DialogFixture.class, DialogFixture.byTitle("Open File or Project"), ofSeconds(10));
             JTextFieldFixture textField = newProjectDialog.getBorderLessTextField();
             JButtonFixture okButton = newProjectDialog.getButton("OK");
             RepeatUtilsKt.waitFor(Duration.ofSeconds(10),
@@ -65,15 +76,15 @@ public class UIBotTestUtils {
                     okButton::isEnabled);
 
             textField.setText(projectPath);
-            RepeatUtilsKt.waitFor(Duration.ofSeconds(10),
-                    Duration.ofSeconds(1),
+            RepeatUtilsKt.waitFor(ofSeconds(10),
+                    ofSeconds(1),
                     "Waiting for open project text box to be populated with set value",
                     "Open project text box was not populated with set value",
                     () -> textField.getText().equals(projectPath));
 
             ComponentFixture projectTree = newProjectDialog.getTree();
-            RepeatUtilsKt.waitFor(Duration.ofSeconds(10),
-                    Duration.ofSeconds(1),
+            RepeatUtilsKt.waitFor(ofSeconds(10),
+                    ofSeconds(1),
                     "Waiting for project tree to show the set project",
                     "The project tree did not show the set project",
                     () -> projectTree.getData().hasText(projectName));
@@ -122,8 +133,8 @@ public class UIBotTestUtils {
 
         // Check if the project tree was expanded and the action is showing.
         ComponentFixture treeFixture = projectFrame.getTree("LibertyTree", action, "1");
-        RepeatUtilsKt.waitFor(Duration.ofSeconds(10),
-                Duration.ofSeconds(2),
+        RepeatUtilsKt.waitFor(ofSeconds(10),
+                ofSeconds(2),
                 "Waiting for " + action + " in tree fixture to show and come into focus",
                 "Action " + action + " in tree fixture is not showing or not in focus",
                 treeFixture::isShowing);
@@ -170,10 +181,10 @@ public class UIBotTestUtils {
      * @param action      The action to run.
      */
     public static void runDashboardActionFromMenuView(RemoteRobot remoteRobot, String projectName, String action) {
-        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofSeconds(10));
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, ofSeconds(10));
         ComponentFixture treeFixture = projectFrame.getTree("LibertyTree", projectName, "1");
-        RepeatUtilsKt.waitFor(Duration.ofSeconds(10),
-                Duration.ofSeconds(2),
+        RepeatUtilsKt.waitFor(ofSeconds(10),
+                ofSeconds(2),
                 "Waiting for " + projectName + " in tree fixture to show",
                 "Action " + action + " in tree fixture is not showing",
                 treeFixture::isShowing);
@@ -196,7 +207,7 @@ public class UIBotTestUtils {
      * @param treeItem    The project name to wait for.
      */
     public static void validateDashboardProjectTreeItemIsShowing(RemoteRobot remoteRobot, String treeItem) {
-        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofSeconds(10));
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, ofSeconds(10));
 
         // There is a window between which the dashboard content may come and go when intellij
         // detects indexing starts and ends. Try to handle it.
@@ -209,8 +220,8 @@ public class UIBotTestUtils {
         // Wait a bit and re-try. Indexing is a long process right now.
         TestUtils.sleepAndIgnoreException(10);
         ComponentFixture treeFixture = projectFrame.getTree("LibertyTree", treeItem, "6");
-        RepeatUtilsKt.waitFor(Duration.ofSeconds(10),
-                Duration.ofSeconds(2),
+        RepeatUtilsKt.waitFor(ofSeconds(10),
+                ofSeconds(2),
                 "Waiting for Tree fixture to show",
                 "Tree fixture is not showing",
                 treeFixture::isShowing);
@@ -231,7 +242,7 @@ public class UIBotTestUtils {
      * @param remoteRobot The RemoteRobot instance.
      */
     public static void openDashboardView(RemoteRobot remoteRobot) {
-        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofSeconds(10));
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, ofSeconds(10));
         try {
             projectFrame.getBaseLabel("Liberty", "5");
         } catch (WaitForConditionTimeoutException e) {
@@ -246,7 +257,7 @@ public class UIBotTestUtils {
      * @param remoteRobot The RemoteRobot instance.
      */
     public static void closeDashboardView(RemoteRobot remoteRobot) {
-        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofSeconds(10));
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, ofSeconds(10));
         try {
             projectFrame.getBaseLabel("Liberty", "2");
             clickOnWindowPaneStripeButton(remoteRobot, "Liberty");
@@ -261,7 +272,7 @@ public class UIBotTestUtils {
      * @param remoteRobot The RemoteRobot instance.
      */
     public static void openProjectView(RemoteRobot remoteRobot) {
-        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofSeconds(10));
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, ofSeconds(10));
         try {
             projectFrame.getContentComboLabel("Project", "5");
         } catch (WaitForConditionTimeoutException e) {
@@ -276,7 +287,7 @@ public class UIBotTestUtils {
      * @param remoteRobot The RemoteRobot instance.
      */
     public static void closeProjectView(RemoteRobot remoteRobot) {
-        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofSeconds(10));
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, ofSeconds(10));
         try {
             projectFrame.getContentComboLabel("Project", "2");
             clickOnWindowPaneStripeButton(remoteRobot, "Project");
@@ -292,7 +303,7 @@ public class UIBotTestUtils {
      * @param StripeButtonName The name of the window pane stripe button.
      */
     public static void clickOnWindowPaneStripeButton(RemoteRobot remoteRobot, String StripeButtonName) {
-        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofSeconds(10));
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, ofSeconds(10));
         ComponentFixture wpStripe = projectFrame.getStripeButton(StripeButtonName);
         wpStripe.click();
     }
@@ -303,7 +314,7 @@ public class UIBotTestUtils {
      * @param remoteRobot The RemoteRobot instance.
      */
     public static void expandDashboardProjectTree(RemoteRobot remoteRobot) {
-        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofSeconds(10));
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, ofSeconds(10));
 
         // Click on the Liberty toolbar to give the dashboard view focus.
         ComponentFixture dashboardBar = projectFrame.getBaseLabel("Liberty", "10");
@@ -344,6 +355,7 @@ public class UIBotTestUtils {
         JTreeFixture projTree = projectFrame.getProjectViewJTree(appName);
         if (!projTree.hasText("server.xml")) {
             projTree.expand(appName, "src", "main", "liberty", "config");
+            //projTree.expand(appName, "build", "wlp", "usr", "servers", "defaultServer");
             projTree.findText("server.xml").doubleClick();
         } else {
             projTree.findText("server.xml").doubleClick();
@@ -352,7 +364,7 @@ public class UIBotTestUtils {
 
     public static void hideTerminalWindow(RemoteRobot remoteRobot) {
         try {
-            ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofSeconds(2));
+            ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, ofSeconds(2));
             Locator toolWindowHideButton = byXpath("//div[@class='ToolWindowHeader'][.//div[@myaction.key='action.NewPredefinedSession.label']]//div[@myaction.key='tool.window.hide.action.name']");
             ComponentFixture hideActionButton = projectFrame.getActionButton(toolWindowHideButton);
             hideActionButton.click();
@@ -368,7 +380,7 @@ public class UIBotTestUtils {
      * @param srcFileName The string file name
      */
     public static void closeSourceFile(RemoteRobot remoteRobot, String srcFileName) {
-        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofSeconds(10));
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, ofSeconds(10));
 
         try {
             Locator locator = byXpath("//div[@accessiblename='" + srcFileName + "' and @class='SingleHeightLabel']//div[@class='InplaceButton']");
@@ -388,11 +400,12 @@ public class UIBotTestUtils {
      */
     public static void hoverInAppServerXML(RemoteRobot remoteRobot, String hoverTarget) {
 
-        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofSeconds(30));
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, ofSeconds(30));
         EditorFixture editorNew = remoteRobot.find(EditorFixture.class, EditorFixture.Companion.getLocator());
+        editorNew.click();
 
         //need to click outside of the editor before attempting a hover
-        remoteRobot.find(ComponentFixture.class, byXpath("//div[@class='ProjectViewTree']")).click();
+        //remoteRobot.find(ComponentFixture.class, byXpath("//div[@class='ProjectViewTree']")).click();
 
         // try to hover over target text
         editorNew.findText(hoverTarget).moveMouse();
@@ -412,7 +425,7 @@ public class UIBotTestUtils {
         // monitor the popup window for the LS Hint text - there can be a delay getting it from the LS
         for (int i = 0; i < 3; i++) {
             // first get the contents of the popup - put in a String
-            ContainerFixture popup = remoteRobot.find(ContainerFixture.class, byXpath("//div[@class='HeavyWeightWindow']"), Duration.ofSeconds(20));
+            ContainerFixture popup = remoteRobot.find(ContainerFixture.class, byXpath("//div[@class='HeavyWeightWindow']"), ofSeconds(20));
             List<RemoteText> rts = popup.findAllText();
             String remoteString = "";
             for (RemoteText rt : rts) {
@@ -429,6 +442,74 @@ public class UIBotTestUtils {
         }
     }
 
+    /**
+     * Moves the mouse cursor to a specific string target in server.xml
+     *
+     * @param remoteRobot The RemoteRobot instance.
+     */
+    public static void insertStanzaInAppServerXML(RemoteRobot remoteRobot, String projName, String stanzaSnippet, int row, int col, InsertionType type) {
+
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, ofSeconds(30));
+        EditorFixture editorNew = remoteRobot.find(EditorFixture.class, EditorFixture.Companion.getLocator());
+        editorNew.click();
+
+        //editorNew.insertTextAtLine(19, 0, "");
+        Keyboard keyboard = new Keyboard(remoteRobot);
+        if (remoteRobot.isWin() || remoteRobot.isLinux()) {
+            //int row = 18;
+            //int col = 40;
+            goToLineAndColumn(remoteRobot, keyboard, row, col);
+            if (type.name().equals("FEATURE")) {
+                keyboard.hotKey(VK_ENTER);
+            }
+        }
+        else { //macos
+            keyboard.hotKey(VK_F1);
+
+        }
+
+        if (type.name().equals("FEATURE")) {
+            // add the feature stanza using completion
+            goToLineAndColumn(remoteRobot, keyboard,  row + 1, col);
+            keyboard.hotKey(VK_CONTROL, VK_SPACE);
+
+            ContainerFixture popup = projectFrame.getDocumentationHintPopup();
+            popup.findText("feature").doubleClick();
+
+
+            // add a feature from the list of features using completion
+            goToLineAndColumn(remoteRobot, keyboard, row + 1, 18);
+        }
+
+        keyboard.enterText(stanzaSnippet);
+        keyboard.hotKey(VK_CONTROL, VK_SPACE);
+        keyboard.enter();
+
+        // let the auto-save function of intellij save the file before testing it
+        keyboard.hotKey(VK_CONTROL, VK_S);
+
+        TestUtils.sleepAndIgnoreException(5);
+    }
+
+    public static void deleteStanzaInAppServerXML(RemoteRobot remoteRobot, String projName, String stanza) {
+
+        ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, ofSeconds(30));
+        EditorFixture editorNew = remoteRobot.find(EditorFixture.class, EditorFixture.Companion.getLocator());
+        Keyboard keyboard = new Keyboard(remoteRobot);
+
+        editorNew.selectText(stanza);
+
+        keyboard.hotKey(VK_BACK_SPACE);
+        keyboard.hotKey(VK_BACK_SPACE);
+    }
+    public static void goToLineAndColumn(RemoteRobot remoteRobot, Keyboard keyboard, int row, int column) {
+        if (remoteRobot.isMac())
+            keyboard.hotKey(KeyEvent.VK_META, KeyEvent.VK_L);
+        else
+            keyboard.hotKey(KeyEvent.VK_CONTROL, KeyEvent.VK_G);
+        keyboard.enterText(row + ":" + column);
+        keyboard.enter();
+    }
     /**
      * Validates the expected hover string message was raised in popup.
      *

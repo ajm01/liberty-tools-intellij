@@ -7,6 +7,9 @@ import io.openliberty.tools.intellij.it.fixtures.ProjectFrameFixture;
 import io.openliberty.tools.intellij.it.fixtures.WelcomeFrameFixture;
 import org.junit.jupiter.api.*;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 
 import static com.intellij.remoterobot.utils.RepeatUtilsKt.waitForIgnoringError;
@@ -93,6 +96,37 @@ public abstract class SingleModLibertyLSTestCommon {
         TestUtils.validateHoverData(hoverExpectedOutcome, hoverFoundOutcome);
     }
 
+    @Test
+    @Video
+    public void testInsertFeatureIntoServerXML() {
+        String testName = "testInsertFeatureIntoServerXML";
+        String stanzasnippet = "el-3";
+        String insertedFeature = "<feature>el-3.0</feature>";
+
+        Path pathToServerXML = null;
+        pathToServerXML = Paths.get(projectPath, "src", "main", "liberty", "config", "server.xml");
+
+        UIBotTestUtils.insertStanzaInAppServerXML(remoteRobot, projectName, stanzasnippet,18, 40, UIBotTestUtils.InsertionType.FEATURE);
+        TestUtils.validateFeatureInServerXML(pathToServerXML.toString(), insertedFeature);
+        UIBotTestUtils.deleteStanzaInAppServerXML(remoteRobot, projectName, insertedFeature);
+    }
+
+    @Test
+    @Video
+    public void testInsertLibertyConfigIntoServerXML() {
+        String testName = "testInsertFeatureIntoServerXML";
+        String stanzasnippet = "use";
+        String insertedConfig = "<userInfo></userInfo>";
+
+        Path pathToServerXML = null;
+        pathToServerXML = Paths.get(projectPath, "src", "main", "liberty", "config", "server.xml");
+
+        UIBotTestUtils.insertStanzaInAppServerXML(remoteRobot, projectName, stanzasnippet, 20, 0, UIBotTestUtils.InsertionType.CONFIG);
+        TestUtils.validateFeatureInServerXML(pathToServerXML.toString(), insertedConfig);
+        UIBotTestUtils.deleteStanzaInAppServerXML(remoteRobot, projectName, insertedConfig);
+
+    }
+
     /**
      * Prepares the environment to run the tests.
      *
@@ -112,6 +146,7 @@ public abstract class SingleModLibertyLSTestCommon {
         ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, Duration.ofMinutes(2));
         JTreeFixture projTree = projectFrame.getProjectViewJTree(projectName);
         projTree.expand(projectName, "src", "main", "liberty", "config");
+        //projTree.expand(projectName, "build", "wlp", "usr", "servers", "defaultServer");
 
         // open server.xml file
         UIBotTestUtils.openServerXMLFile(remoteRobot, projectName);
