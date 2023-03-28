@@ -455,18 +455,18 @@ public class UIBotTestUtils {
 
         //editorNew.insertTextAtLine(19, 0, "");
         Keyboard keyboard = new Keyboard(remoteRobot);
-        if (remoteRobot.isWin() || remoteRobot.isLinux()) {
+        //if (remoteRobot.isWin() || remoteRobot.isLinux()) {
             //int row = 18;
             //int col = 40;
             goToLineAndColumn(remoteRobot, keyboard, row, col);
             if (type.name().equals("FEATURE")) {
                 keyboard.hotKey(VK_ENTER);
             }
-        }
-        else { //macos
-            keyboard.hotKey(VK_F1);
+        //}
+        //else { //macos
+            //keyboard.hotKey(VK_F1);
 
-        }
+        //}
 
         if (type.name().equals("FEATURE")) {
             // add the feature stanza using completion
@@ -486,7 +486,12 @@ public class UIBotTestUtils {
         keyboard.enter();
 
         // let the auto-save function of intellij save the file before testing it
-        keyboard.hotKey(VK_CONTROL, VK_S);
+        if (remoteRobot.isMac()) {
+            keyboard.hotKey(VK_META, VK_S);
+        }
+        else{
+            keyboard.hotKey(VK_CONTROL, VK_S);
+        }
 
         TestUtils.sleepAndIgnoreException(5);
     }
@@ -496,11 +501,21 @@ public class UIBotTestUtils {
         ProjectFrameFixture projectFrame = remoteRobot.find(ProjectFrameFixture.class, ofSeconds(30));
         EditorFixture editorNew = remoteRobot.find(EditorFixture.class, EditorFixture.Companion.getLocator());
         Keyboard keyboard = new Keyboard(remoteRobot);
+        editorNew.click();
 
+        System.out.println("AJM: selecting text: "+ stanza);
         editorNew.selectText(stanza);
+        TestUtils.sleepAndIgnoreException(5);
 
-        keyboard.hotKey(VK_BACK_SPACE);
-        keyboard.hotKey(VK_BACK_SPACE);
+        if (remoteRobot.isMac()) {
+            System.out.println("AJM: trying to delete on mac");
+            keyboard.hotKey(VK_DELETE);
+            keyboard.hotKey(VK_DELETE);
+        }
+        else { //win or linux
+            keyboard.hotKey(VK_BACK_SPACE);
+            keyboard.hotKey(VK_BACK_SPACE);
+        }
     }
     public static void goToLineAndColumn(RemoteRobot remoteRobot, Keyboard keyboard, int row, int column) {
         if (remoteRobot.isMac())

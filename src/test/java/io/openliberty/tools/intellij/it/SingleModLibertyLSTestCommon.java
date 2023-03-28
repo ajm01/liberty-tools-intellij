@@ -107,7 +107,7 @@ public abstract class SingleModLibertyLSTestCommon {
         pathToServerXML = Paths.get(projectPath, "src", "main", "liberty", "config", "server.xml");
 
         UIBotTestUtils.insertStanzaInAppServerXML(remoteRobot, projectName, stanzasnippet,18, 40, UIBotTestUtils.InsertionType.FEATURE);
-        TestUtils.validateFeatureInServerXML(pathToServerXML.toString(), insertedFeature);
+        TestUtils.validateStanzaInServerXML(pathToServerXML.toString(), insertedFeature);
         UIBotTestUtils.deleteStanzaInAppServerXML(remoteRobot, projectName, insertedFeature);
     }
 
@@ -122,7 +122,7 @@ public abstract class SingleModLibertyLSTestCommon {
         pathToServerXML = Paths.get(projectPath, "src", "main", "liberty", "config", "server.xml");
 
         UIBotTestUtils.insertStanzaInAppServerXML(remoteRobot, projectName, stanzasnippet, 20, 0, UIBotTestUtils.InsertionType.CONFIG);
-        TestUtils.validateFeatureInServerXML(pathToServerXML.toString(), insertedConfig);
+        TestUtils.validateStanzaInServerXML(pathToServerXML.toString(), insertedConfig);
         UIBotTestUtils.deleteStanzaInAppServerXML(remoteRobot, projectName, insertedConfig);
 
     }

@@ -217,11 +217,11 @@ public class TestUtils {
         }
     }
 
-    public static void validateFeatureInServerXML(String pathToServerXml, String insertedFeature) {
+    public static void validateStanzaInServerXML(String pathToServerXml, String insertedStanza) {
 
-        System.out.println("AJM: looking for: " + insertedFeature + " in file: " + pathToServerXml);
+        System.out.println("AJM: looking for: " + insertedStanza + " in file: " + pathToServerXml);
         try {
-            Assertions.assertTrue(isTextInFile(pathToServerXml, insertedFeature));
+            Assertions.assertTrue(isTextInFile(pathToServerXml, insertedStanza));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -287,6 +287,7 @@ public class TestUtils {
 
         List<String> lines = Files.readAllLines(Paths.get(filePath));
         for (String line : lines) {
+            System.out.println("AJM: line in file : " + line);
             if (line.contains(text)) {
                 return true;
             }
